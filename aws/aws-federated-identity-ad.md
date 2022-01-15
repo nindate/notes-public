@@ -20,26 +20,26 @@ Accept all default configurations for all roles.
 <a id='ad-config'></a>
 ### 2. Active Directory Configuration
 
-#### Create new Forest
+#### 2.1 Create new Forest
 After all roles are installed, go to Notifications and click Promote server to domain server
 
 Create a new forest and give it some name - e.g. mycompany.com
 
 Server will automatically reboot after the above configuration is completed
 
-#### Create Organizational Unit (OU) - optional
+#### 2.2 Create Organizational Unit (OU) - optional
 It is a good practise to create an OU to manage all relevant users and groups. This is optional however.
 
 Create an Organizational Unit named AWS
 
-#### Create Groups
+#### 2.3 Create Groups
 Create Groups to group users that will have certain AWS accesses. 
 
 Create following groups (replace 12345789012 with your AWS account number without any dashes)
 * AWS-12345789012-ADFS-EC2-ADMINS - Users in this group will be provided EC2 Full access in AWS
 * AWS-12345789012-ADFS-S3-ADMINS - Users in this group will be provided S3 Full access in AWS
 
-#### Create Users
+#### 2.4 Create Users
 Create following login users, who will be provided necessary access to AWS
 * bob
 * mark
