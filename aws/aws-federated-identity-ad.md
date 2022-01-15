@@ -85,15 +85,61 @@ Once certificate is created, right-click the certificate and export certificate 
 
    * Import Certificate
 
-   * Give display name as AWS Console Signon
+   * Give display name as Corporate ADFS
 
    * Select the service account - adfs_svc [give password]
 
    You need to Reboot server after above step completes
 
-2. Download ADFS federation XML
-   * Open Edge browser and paste the below URL to download the XML file
+2. Download ADFS federation XML.  
+   This will be required when creating Identity Provider in AWS.
+   * Open Edge browser and paste the below URL to download the XML file  
    https://localhost/federationmetadata/2007-06/federationmetadata.xml
+
+3. Configure Relying Party Trust in ADFS
+   In Server Manager, open AD FS Management
+   * Add Relying Party Trust
+     * Click on Relying Party Trusts -> Add Relying Party Trust -> Claims aware
+     * In the Import data about ... on a local network, paste followig URL for meatadata  
+    https://signin.aws.amazon.com/static/saml-metadata.xml
+     * Give display name as AWS Console Signin
+     * Select Permit everyone
+     * Save
+
+   * Add Claims rules
+     * Click the Relying Party Trust and select Edit Claim Issuance Policy
+     * Add rule 1
+     >* Claim rule template: Transform an incoming claim  
+     >* rule name: NameId  
+     >* Incoming claim type: Windows account name  
+     >* Outgoing claim type: Name ID  
+     >* Outgoing name ID format: Persistent Identifier
+     >* Pass through all claim values: checked
+
+     * Add rule 2
+     >* Claim rule template: Send LDAP Attributes as Claims.
+     >* rule name: RoleSessionName
+     >* Attribute store: Active Directory
+     >* LDAP Attribute: E-Mail-Addresses
+     >* Outgoing Claim Type: https://aws.amazon.com/SAML/Attributes/RoleSessionName
+
+     * Add rule 3
+     >* Claim rule template: Send Claims Using a Custom Rule
+     >* rule name: Get AD Groups
+     >* Custom rule: 
+     >```
+     >c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname", Issuer == "AD AUTHORITY"]
+     >=> add(store = "Active Directory", types = ("http://temp/variable"), query = ";tokenGroups;{0}", param = c.Value);
+     >```
+
+     * Add rule 4
+     >* Claim rule template: Send Claims Using a Custom Rule
+     >* rule name: Roles
+     >* Custom rule: 
+     >```
+     >c:[Type == "http://temp/variable", Value =~ "(?i)^AWS-([\d]{12})"] => issue(Type = "https://aws.amazon.com/SAML/Attributes/Role", Value = RegExReplace(c.Value, "AWS-([\d]{12})-", "arn:aws:iam::$1:saml-provider/CORP_AD,arn:aws:iam::$1:role/"));
+     >```
+
 
 
 <a id='aws-idp-roles'></a>
