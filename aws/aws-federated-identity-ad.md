@@ -40,23 +40,28 @@ Create following groups (replace 12345789012 with your AWS account number withou
 * AWS-12345789012-ADFS-S3-ADMINS - Users in this group will be provided S3 Full access in AWS
 
 #### 2.4 Create Users
-Create following login users, who will be provided necessary access to AWS
-* bob
-* mark
+1. Create following login users, who will be provided necessary access to AWS
+  * bob
+  * mark
 
-After the users are created, edit user bob and do the following:
-* Set email address for bob e.g. bob@mycompamy.com
-* Add user **bob** to following groups:
-  * Administrators - to allow user to be able to use RDP (need to find better way to provide RDP access without adminstrator group membership)
-  * AWS-12345789012-ADFS-EC2-ADMINS - to allow user to have EC2 Full access in AWS (after the ADFS and AWS side configurations are in place)
+2. Edit user bob and do the following:
+   * Set email address for bob e.g. bob@mycompamy.com (This is important, because in ADFS rules it will be used)
+   * Add user **bob** to following groups:
+     * Administrators - to allow user to be able to use RDP (need to find better way to provide RDP access without adminstrator group membership)
+     * AWS-12345789012-ADFS-EC2-ADMINS - to allow user to have EC2 Full access in AWS (after the ADFS and AWS side configurations are in place)
 
-Edit user mark and do the following:
-* Add user **mark** to following groups:
-  * Administrators - to allow user to be able to use RDP (need to find better way to provide RDP access without adminstrator group membership)
-  * AWS-12345789012-ADFS-S3-ADMINS - to allow user to have S3 Full access in AWS (after the ADFS and AWS side configurations are in place)
+3. Edit user mark and do the following:
+   * Set email address for mark e.g. mark@mycompamy.com (This is important, because in ADFS rules it will be used)
+   * Add user **mark** to following groups:
+     * Administrators - to allow user to be able to use RDP (need to find better way to provide RDP access without adminstrator group membership)
+     * AWS-12345789012-ADFS-S3-ADMINS - to allow user to have S3 Full access in AWS (after the ADFS and AWS side configurations are in place)
 
 
-Create a service user named adfs_svc for ADFS. Set password never expires.
+4. Create a service account (user) named adfs_svc for ADFS. Set password never expires.
+
+5. Set Service Principal Name (SPN) for the service account adfs_svc. Open Powershell prompt and run following command.
+
+   ```setspn -a host/localhost adfs_svc```
 
 <a id='self-signed-cert'></a>
 ### 3. Self Signed Certificate
