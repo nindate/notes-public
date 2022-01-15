@@ -8,7 +8,7 @@
 
 
 <a id='install-server-roles'></a>
-### Install Server Roles
+### 1. Install Server Roles
 Login to Windows server, launch Server Manager and install following server roles
 * Active Directory Domain Services (ADDS)
 * Active Directory Federated Services (ADFS)
@@ -18,7 +18,7 @@ Login to Windows server, launch Server Manager and install following server role
 Accept all default configurations for all roles.
 
 <a id='ad-config'></a>
-### Active Directory Configuration
+### 2. Active Directory Configuration
 
 #### Create new Forest
 After all roles are installed, go to Notifications and click Promote server to domain server
@@ -59,12 +59,12 @@ Edit user mark and do the following:
 Create a service user named adfs_svc for ADFS. Set password never expires.
 
 <a id='self-signed-cert'></a>
-Self Signed Certificate
+### 3. Self Signed Certificate
 
 
 <a id='adfs-config'></a>
-Active Directory Federated Services Configuration
+### 4. Active Directory Federated Services Configuration
 
 
 <a id='aws-idp-roles'></a>
-Install Server Roles
+### 5. AWS Identity Provider and Roles
