@@ -41,8 +41,8 @@ Create following groups (replace 12345789012 with your AWS account number withou
 
 #### 2.4 Create Users
 1. Create following login users, who will be provided necessary access to AWS
-  * bob
-  * mark
+   * bob
+   * mark
 
 2. Edit user bob and do the following:
    * Set email address for bob e.g. bob@mycompamy.com (This is important, because in ADFS rules it will be used)
@@ -65,10 +65,35 @@ Create following groups (replace 12345789012 with your AWS account number withou
 
 <a id='self-signed-cert'></a>
 ### 3. Self Signed Certificate
+Create a self signed certificate which will be required in the ADFS configuration.
+
+From Server Manager, go to IIS Manager. 
+
+Click on the IIS server name, from right side select Server certificates, then from right pane select Create Self-signed cert.
+* Give it a name: ADFS-CERT
+* Select Web hosting
+* Set password
+
+Once certificate is created, right-click the certificate and export certificate as ADFS_CERT.pfx [save to desktop]
+
 
 
 <a id='adfs-config'></a>
 ### 4. Active Directory Federated Services Configuration
+1. Create ADFS farm
+   * In Server Manager, go to Notifications and click "Configure the federation service on this server"
+
+   * Import Certificate
+
+   * Give display name as AWS Console Signon
+
+   * Select the service account - adfs_svc [give password]
+
+   You need to Reboot server after above step completes
+
+2. Download ADFS federation XML
+   * Open Edge browser and paste the below URL to download the XML file
+   https://localhost/federationmetadata/2007-06/federationmetadata.xml
 
 
 <a id='aws-idp-roles'></a>
