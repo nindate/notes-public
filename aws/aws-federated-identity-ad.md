@@ -5,6 +5,7 @@
 3. [Self Signed Certificate](#self-signed-cert)
 4. [Active Directory Federated Services Configuration](#adfs-config)
 5. [AWS Identity Provider and Roles](#aws-idp-roles)
+6. [Access AWS Console using Federated Identity](#aws-access)
 
 
 <a id='install-server-roles'></a>
@@ -139,8 +140,54 @@ Once certificate is created, right-click the certificate and export certificate 
      >```
      >c:[Type == "http://temp/variable", Value =~ "(?i)^AWS-([\d]{12})"] => issue(Type = "https://aws.amazon.com/SAML/Attributes/Role", Value = RegExReplace(c.Value, "AWS-([\d]{12})-", "arn:aws:iam::$1:saml-provider/CORP_AD,arn:aws:iam::$1:role/"));
      >```
+     
+     Few very important points to note over here. 
+     * CORP_AD here refers to the name you will be configuring Identify Provider in AWS IAM. Thus if you will be using a different name, update this rule appropriately.
+     * The above rule matches AD groups having names that start with AWS-any_twelve_digit_number- and maps them to AWS Role. e.g. matches AD group named AWS-12345789012-ADFS-EC2-ADMINS and maps to AWS role named ADFS-EC2-ADMINS
+     * Thus any users in an AD group that matches above pattern will automatically get mapped to corresponding named AWS Role when they access AWS via the ADFS URL.
 
+4. Open Powershell prompt and run following command.
+   ```
+   Set-AdfsProperties -EnableIdPInitiatedSignonPage $True
+   ```
+   Without the above configuration, when laundhing  the ADFS page it gives an error
+
+5. Add support for Edge/Chrome/Mozilla browsers for single sign-on  
+   By default only IE browser provides single sign-on via ADFS. To add Mozilla/Chrome browser or Edge browser to the list of supported browsers, carryout the following steps:
+   * Add support for Mozilla/Chrome
+   ```
+   Set-AdfsProperties -WIASupportedUserAgents ((Get-ADFSProperties | Select -ExpandProperty WIASupportedUserAgents) + "Mozilla/5.0 (Windows NT")
+   ```
+   * Add support for Edge browser
+   ```
+   Set-AdfsProperties -WIASupportedUserAgents ((Get-ADFSProperties | Select -ExpandProperty WIASupportedUserAgents) + "Edge/12")
+   ```
 
 
 <a id='aws-idp-roles'></a>
 ### 5. AWS Identity Provider and Roles
+
+1. Create Identity Provider in AWS of type SAML2.0.  
+   You will need the ADFS federation XML that you downloaded in an earlier step.
+  * Name it as CORP_AD (we have this name in one of the claim rules above)
+  * Upload the ADFS federation XML
+
+2. Create 2 Roles of type SAML 2.0 Federated. 
+   * Select the CORP_AD as the identity provider, select API & Console access
+   * Role named ADFS-EC2-ADMINS - having EC2 Full Access
+   * Role named ADFS-S3-ADMINS - having S3 Full Access
+
+
+<a id='aws-access'></a>
+### 6. Access AWS Console using Federated Identity
+If using IE browser, due to higher restrictions, you need to keep adding multiple sites to Trusted list of sites. Instead, better option is to use any of Edge/Chrome/Mozilla Firefox browser
+1. Open an RDP session to the Windows server and login with one of the users - bob or mark
+2. Open Edge browser or Chrome browser (you will need to install Chrome if you need). Launch the URL https://localhost/adfs/ls/idpinitiatedsignon.aspx
+3. Select AWS Console Signin and signin. You will get automatically logged into AWS console (based on your AD login) and assigned appropriate role (as per AWS Role mapped with AD Group from the ADFS claims rule that was configured)
+
+
+
+This is how you can use AWS Federated Identity with Microsoft AD and ADFS
+
+
+
